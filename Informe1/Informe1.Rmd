@@ -1,0 +1,14 @@
+## Trabajo 1 datos categóricos
+
+## 1.
+
+## 2.
+
+## 3.
+
+## 4. Lectura de datos de imagenes
+```{r}
+
+```
+
+
