@@ -1,12 +1,32 @@
 ## Trabajo 1 datos categóricos
 
-## 1.
+## 1. Replicación de prueba exacta de fisher:
 
-## 2.
+Se dispone de los siguientes datos:
 
-## 3.
+Se construye una prueba exacta de fisher en dónde:
+
+"Hipótesis a probar"
+Bajo $H_0$:
+
+El Valor-p se calcula cómo:
+
+
+Ya que $V_p$ se concluye que con una significancia $\alpha=0.05$ que
+
+## 2. Análisis descriptivo de datos de accidentes de tránsito
+
+## 3. Análisis de base de datos de casados
+
+```{r}
+## Lectura de datos:
+parejas <- read.csv2('PAREJAS.txt')
+```
 
 ## 4. Lectura de datos de imagenes
+
+Se plantea
+
 ```{r}
 
 ```
