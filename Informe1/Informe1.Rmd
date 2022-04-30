@@ -1,8 +1,18 @@
+```{r}
+library(knitr)
+library(kable)
+```
+
 ## Trabajo 1 datos categóricos
 
 ## 1. Replicación de prueba exacta de fisher:
 
 Se dispone de los siguientes datos:
+
+```{r}
+
+```
+
 
 Se construye una prueba exacta de fisher en dónde:
 
@@ -25,10 +35,24 @@ parejas <- read.csv2('PAREJAS.txt')
 
 ## 4. Lectura de datos de imagenes
 
-Se plantea
+Se obtienen 50 imagenes en donde todas las personas están de frente, usando luz medianamente natural y sin portar ningún accesorio, 25 de personas con rasgos femeninos y 25 de personas con rasgos masculinos. Se pregunta a 10 personas (5 hombres y 5 mujeres) acerca de a cuántas personas considera como bonitas y a cuantas personas considera como feas, para ello se utiliza la herramienta interactiva 'tiermaker' en dónde los usuarios pueden crear tablas de clasificación de fotografías:
+
+![imagen_fotos](imagen_fotos.jpg)
+
+Obteniendo así los siguientes resultados por genero plasmados en tablas 2x2:
 
 ```{r}
-
+#Codigo que genera tablas 2x2
 ```
 
+De los resultados obtenidos se generan tres tablas 2x2, una general con el fin de obtener rasgos generales, una para las clasificaciones realizadas por las mujeres y otra para las clasificaciones realizadas por los hombres:
 
+```{r}
+#Codigo de tabla general
+```
+
+```{r}
+#Codigo de tabla para hombres y mujeres
+```
+
+De la información obtenida en las tablas se concluye que:
