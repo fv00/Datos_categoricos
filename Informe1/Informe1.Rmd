@@ -7,12 +7,13 @@ library(kable)
 
 ## 1. Replicación de prueba exacta de fisher:
 
-Se dispone de los siguientes datos:
+Se dispone de la siguiente tabla que representa:
 
 ```{r}
 
 ```
 
+Se plantea la posibilidad de realizar una exacta de fisher ya que se sospecha que existe sesgo hacia , por lo que se plantea la prueba.
 
 Se construye una prueba exacta de fisher en dónde:
 
