@@ -1,0 +1,25 @@
+Nelson:
+	atractiv@	no_atractiv@
+mujer	4		21
+hombre	6		19
+
+Carlos:
+
+	atractiv@	no_atractiv@
+mujer	9		16
+hombre	13		12
+
+Laura:
+	atractiv@	no_atractiv@
+mujer	3		22
+hombre	16		9
+
+Gustavo:
+	atractiv@	no_atractiv@
+mujer	5		20
+hombre	13		12
+
+Duvan:
+	atractiv@	no_atractiv@
+mujer	6		19
+hombre	7		18
