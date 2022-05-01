@@ -1,59 +1,228 @@
-```{r}
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r, include=FALSE}
 library(knitr)
-library(kable)
+library(ggplot2)
+library(gridExtra)
+library(grid)
+library(readxl)
+library(tidyr)
+library(ggpubr)
+library(dplyr, warn.conflicts = FALSE)
+# Suppress summarise info
+options(dplyr.summarise.inform = FALSE, scipen=999)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, comment = "", warnings=FALSE, message = FALSE)
+mytheme <- gridExtra::ttheme_default(
+             core = list(padding=unit(c(1, 1), "mm"))
+           )
 ```
 
 ## Trabajo 1 datos categóricos
 
-## 1. Replicación de prueba exacta de fisher:
+## 1. Prueba exacta de Fisher:
 
-Se dispone de la siguiente tabla que representa:
+Se introduce la prueba exacta de Fisher como una prueba que ayuda a probar independencia entre variables a partir de tablas de contingencia, para esta ilustración se realizará un ejemplo mediante datos simulados asociados a la tasa de empleados en los egresados de dos universidades ficticias:
+
+Primeramente se generan dos muestras de 50 estudiantes de dos universidades, considere las siguientes variables aleatorias:
+
+$X_i$: Estado de empleado del i-esimo egresado de la universidad X.
+
+$Y_i$: Estado de empleado del i-esimo egresado de la universidad Y.
+
+Se tiene que $\sum{X_i}\sim Binom(50, 0.6)$ y $\sum{Y_i}\sim Binom(50,0.9)$. 
+
+Se obtiene así los siguientes resultados simulados:
+
+```{r, fig.width=10, fig.height=5}
+##Simulacion datos para ilustracion de prueba de fisher:
+set.seed(123)
+simulacion1 <- sample(c('Empleado', 'Desempleado'), 50, replace = TRUE, prob = c(0.6, 0.4))
+simulacion1 <- data.frame(Empleo = simulacion1, Educacion = rep('Universidad X', 50))
+
+simulacion2 <- sample(c('Empleado', 'Desempleado'), 50, replace = TRUE, prob = c(0.9, 0.1))
+simulacion2 <- data.frame(Empleo = simulacion2, Educacion = rep('Universidad Y', 50))
+
+datos_simulados <- rbind(simulacion1, simulacion2)
+datos_simulados <-table(datos_simulados)
+grid.arrange(tableGrob(datos_simulados, theme=mytheme), nrow=1, ncol=1)
+```
+Bajo el esquema de la prueba de Fisher se plantea el siguiente juego de hipótesis:
+
+$H_0$: No existe asociación entre la pertenencia a una determinada universidad y la empleabilidad de sus egresados.
+
+$H_a$: Existe evidencia de asociación entre la pertenencia a una determinada universidad y la empleabilidad de sus egresados.
+
+
+Se plantea la prueba exacta de Fisher mediante el la función fisher.test() del paquete stats de R:
 
 ```{r}
-
+fisher.test(datos_simulados)
 ```
 
-Se plantea la posibilidad de realizar una exacta de fisher ya que se sospecha que existe sesgo hacia , por lo que se plantea la prueba.
+Ya que $V_p < 0.05$ se concluye con una significancia $\alpha=0.05$ que según la prueba exacta de fisher se tiene evidencia de que se tiene asociación entre pertenecer a una universidad u otra y ser empleado o desempleado estando recién egresado, resultado consecuente con la forma en que se planteó la simulación de los datos.
 
-Se construye una prueba exacta de fisher en dónde:
+Es importante resaltar en este caso que los datos son simulados mediante supuestos distribucionales binomiales y que la prueba exacta de fisher usa un esquema distribucional hipergeométrico. Aún así los resultados obtenidos en la prueba son consistentes con lo que se planteó inicialmente.
 
-"Hipótesis a probar"
-Bajo $H_0$:
-
-El Valor-p se calcula cómo:
-
-
-Ya que $V_p$ se concluye que con una significancia $\alpha=0.05$ que
-
-## 2. Análisis descriptivo de datos de accidentes de tránsito
-
-## 3. Análisis de base de datos de casados
-
-```{r}
-## Lectura de datos:
-parejas <- read.csv2('PAREJAS.txt')
-```
+\newpage
 
 ## 4. Lectura de datos de imagenes
 
 Se obtienen 50 imagenes en donde todas las personas están de frente, usando luz medianamente natural y sin portar ningún accesorio, 25 de personas con rasgos femeninos y 25 de personas con rasgos masculinos. Se pregunta a 10 personas (5 hombres y 5 mujeres) acerca de a cuántas personas considera como bonitas y a cuantas personas considera como feas, para ello se utiliza la herramienta interactiva 'tiermaker' en dónde los usuarios pueden crear tablas de clasificación de fotografías:
 
-![imagen_fotos](imagen_fotos.jpg)
+![Visualización herramienta](herramienta.jpg)
+![Imagenes utilizadas](imagenes.JPG)
 
 Obteniendo así los siguientes resultados por genero plasmados en tablas 2x2:
 
 ```{r}
-#Codigo que genera tablas 2x2
+datos_encuestas <- read_excel('resultados_categoricos.xlsx')
+#Generacion de bases de datos
+tablas <- list()
+for(i in 1:10){
+    datos <- as.data.frame(datos_encuestas[datos_encuestas['Tanda']==i,])
+    datos <- t(matrix(datos$Resultado, nrow = 2, ncol = 2))
+    row.names(datos) <- c('Mujer', 'Hombre')
+    colnames(datos) <- c('Bonito', 'Feo')
+    tablas[[i]] <- datos
+}
+grid.arrange(
+  tableGrob(tablas[[1]]),
+  tableGrob(tablas[[2]]),
+  tableGrob(tablas[[3]]),
+  tableGrob(tablas[[4]]),
+  tableGrob(tablas[[5]]),
+  tableGrob(tablas[[6]]),
+  tableGrob(tablas[[7]]),
+  tableGrob(tablas[[8]]),
+  tableGrob(tablas[[9]]),
+  tableGrob(tablas[[10]]),
+  nrow=5,
+  ncol=2
+  )
 ```
 
 De los resultados obtenidos se generan tres tablas 2x2, una general con el fin de obtener rasgos generales, una para las clasificaciones realizadas por las mujeres y otra para las clasificaciones realizadas por los hombres:
 
 ```{r}
-#Codigo de tabla general
+tabla_general <- datos_encuestas %>% 
+    group_by(Genero, Belleza) %>% summarise(Resultado =sum(Resultado))
+tabla_general <- t(matrix(tabla_general$Resultado, nrow = 2, ncol = 2))
+tabla_general <- tabla_general[c(2,1),]
+row.names(tabla_general) <- c('Mujer', 'Hombre')
+colnames(tabla_general) <- c('Bonito', 'Feo')
+grid.table(tabla_general)
 ```
+Se observa que aparentemente no existe un sesgo entre el genero de la persona de la foto y la percepción que se tiene sobre esta en los resultados generales obtenidos.
 
 ```{r}
-#Codigo de tabla para hombres y mujeres
+tabla_mujeres <- datos_encuestas[datos_encuestas['Genero-Encuestado']=='F',] %>% 
+    group_by(Genero, Belleza) %>% summarise(Resultado =sum(Resultado))
+tabla_mujeres <- t(matrix(tabla_mujeres$Resultado, nrow = 2, ncol = 2))
+row.names(tabla_mujeres) <- c('Mujer', 'Hombre')
+colnames(tabla_mujeres) <- c('Bonito', 'Feo')
+
+tabla_hombres <- datos_encuestas[datos_encuestas['Genero-Encuestado']=='M',] %>% 
+    group_by(Genero, Belleza) %>% summarise(Resultado =sum(Resultado))
+tabla_hombres <- t(matrix(tabla_hombres$Resultado, nrow = 2, ncol = 2))
+tabla_hombres <- tabla_hombres[c(2,1),]
+row.names(tabla_hombres) <- c('Mujer', 'Hombre')
+colnames(tabla_hombres) <- c('Bonito', 'Feo')
+
+grid.arrange(
+  top='Resultados Hombres vs Resultados Mujeres',
+  tableGrob(tabla_hombres),
+  tableGrob(tabla_mujeres),
+  nrow=2,
+  ncol=2
+)
+```
+Se observa que para los resultados obtenidos en ambos sexo aparentemente no existe un sesgo entre el genero de la persona de la foto y la percepción que se tiene sobre esta.
+
+A partir de la información obtenida se plantea lo siguiente:
+
+* Realizar un análisis descriptivo acerca de los resultados obtenidos en donde se intente observar sí existe una posible asociación entre el Sexo de las personas que están en las imagenes y la percepción que tuvieron las personas encuestadas respecto a sí esas personas son bonitas o feas.
+* Realizar la prueba exacta de Fisher sobre los resultados generales y segregados por sexo para determinar sí es posible que estos cambien respecto al sexo de la persona a la que se entreviste.
+
+Se realizan gráficas generales en donde se intenta observar posibles asociaciones entre variables:
+
+```{r}
+datos_encuestas %>% ggplot(aes(x=Belleza, y=Resultado, fill=Genero)) +
+  geom_bar(position = 'stack', stat = 'identity') + scale_fill_manual(values = c("grey10","grey30"))
+```
+A partir de la gráfica general no se puede observar alguna inclinación a la percepción de belleza dependiendo del genero.
+
+```{r}
+##Grafica mujeres
+mujeres <- datos_encuestas[datos_encuestas['Genero-Encuestado']=='F', ] %>% ggplot(aes(x=Belleza, y=Resultado, fill=Genero)) +
+  geom_bar(position = 'stack', stat = 'identity') + scale_fill_manual(values = c("grey10","grey30")) + ggtitle('Resultados Mujeres')
+##Grafica hombres
+hombres <-datos_encuestas[datos_encuestas['Genero-Encuestado']=='M', ] %>% ggplot(aes(x=Belleza, y=Resultado, fill=Genero)) +
+  geom_bar(position = 'stack', stat = 'identity') + scale_fill_manual(values = c("grey10","grey30")) + ggtitle('Resultados Hombres')
+
+ggarrange(mujeres, hombres)
 ```
 
-De la información obtenida en las tablas se concluye que:
+A partir de las gráficas se puede observar que graficamente no se observa posible disparidad entre el genero y la belleza percibida tanto de manera general como de manera segregada en los encuestados.
+
+A continuación se plantean las correspondientes pruebas exactas de Fisher:
+
+### Prueba de Fisher para la tabla general
+
+Bajo el esquema de la prueba de Fisher se plantea el siguiente juego de hipótesis:
+
+$H_0$: No existe isparidad entre el genero y la belleza percibida.
+
+$H_a$: Existe evidencia de isparidad entre el genero y la belleza percibida.
+
+Se rechaza $H_0$ sí $V_p<0.05$
+
+```{r}
+fisher.test(tabla_general)
+p_valor_general <- fisher.test(tabla_general)$p.value
+```
+Corroborando con la información gráfica a partir del resultado de la prueba no se puede concluir que exista relación entre el género y la percepción que se tiene sobre la belleza de las personas en las fotos para las personas encuestadas.
+
+### Prueba de Fisher para las respuestas de las mujeres
+
+Bajo el esquema de la prueba de Fisher se plantea el siguiente juego de hipótesis:
+
+$H_0$: No existe isparidad entre el genero y la belleza percibida.
+
+$H_a$: Existe evidencia de isparidad entre el genero y la belleza percibida.
+
+Se rechaza $H_0$ sí $V_p<0.05$.
+
+```{r}
+fisher.test(tabla_mujeres)
+p_valor_mujeres <- fisher.test(tabla_mujeres)$p.value
+```
+Corroborando con la información gráfica a partir del resultado de la prueba no se puede concluir que exista relación entre el género y la percepción que se tiene sobre la belleza de las personas en las fotos para las mujeres encuestadas.
+
+### Prueba de Fisher para las respuestas de los hombres
+
+Bajo el esquema de la prueba de Fisher se plantea el siguiente juego de hipótesis:
+
+$H_0$: No existe isparidad entre el genero y la belleza percibida.
+
+$H_a$: Existe evidencia de isparidad entre el genero y la belleza percibida.
+
+Se rechaza $H_0$ sí $V_p<0.05$.
+
+```{r}
+fisher.test(tabla_hombres)
+p_valor_hombres <- fisher.test(tabla_hombres)$p.value
+```
+
+Corroborando con la información gráfica a partir del resultado de la prueba no se puede concluir que exista relación entre el género y la percepción que se tiene sobre la belleza de las personas en las fotos para los hombres encuestados.
+
+A partir de los resultados obtenidos se pueden realizar las siguientes conclusiones:
+
+* Según los resultados en las pruebas realizadas no se tiene evidencia acerca de la existencia de algún sesgo de belleza asociado al sexo de las personas encontradas en las fotografías tanto para los resultados generales como para los resultados segregados por el sexo de las personas encuestadas.
+* Tener en cuenta de que para obtener los datos utilizados en las pruebas no se tuvo de referente ningún esquema de muestreo para elegir a las personas, pero sí se tuvo en cuenta que por la naturaleza del experimento la clasificación de las imagenes sería una variable binomial.
+

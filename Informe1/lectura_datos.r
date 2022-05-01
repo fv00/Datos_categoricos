@@ -50,3 +50,20 @@ fisher.test(tabla_mujeres)
 #Tabla hombres
 fisher.test(tabla_hombres)
 "Se concluye que la selección es estrictamente aleatoria"
+
+##Simulacion datos para prueba de fisher:
+set.seed(123)
+simulacion1 <- sample(c('Empleado', 'Desempleado'), 50, replace = TRUE, prob = c(0.6, 0.4))
+
+simulacion1 <- data.frame(Empleo = simulacion1, Educacion = rep('X', 50))
+
+simulacion2 <- sample(c('Empleado', 'Desempleado'), 50, replace = TRUE, prob = c(0.9, 0.1))
+
+simulacion2 <- data.frame(Empleo = simulacion2, Educacion = rep('Y', 50))
+
+datos_simulados <- rbind(simulacion1, simulacion2)
+datos_simulados
+
+datos_simulados <-table(datos_simulados)
+datos_simulados
+fisher.test(datos_simulados)
